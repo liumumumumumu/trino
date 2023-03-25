@@ -11,16 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.trino.sql.tree;
+package io.trino.plugin.deltalake.expression;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+
+import static com.google.common.base.MoreObjects.toStringHelper;
 
 public class ArithmeticBinaryExpression
-        extends Expression
+        extends SparkExpression
 {
     public enum Operator
     {
@@ -28,8 +26,9 @@ public class ArithmeticBinaryExpression
         SUBTRACT("-"),
         MULTIPLY("*"),
         DIVIDE("/"),
-        MODULUS("%");
-
+        MODULUS("%"),
+        BITWISE_AND("&"),
+        BITWISE_XOR("^");
         private final String value;
 
         Operator(String value)
@@ -44,22 +43,11 @@ public class ArithmeticBinaryExpression
     }
 
     private final Operator operator;
-    private final Expression left;
-    private final Expression right;
+    private final SparkExpression left;
+    private final SparkExpression right;
 
-    public ArithmeticBinaryExpression(Operator operator, Expression left, Expression right)
+    public ArithmeticBinaryExpression(Operator operator, SparkExpression left, SparkExpression right)
     {
-        this(Optional.empty(), operator, left, right);
-    }
-
-    public ArithmeticBinaryExpression(NodeLocation location, Operator operator, Expression left, Expression right)
-    {
-        this(Optional.of(location), operator, left, right);
-    }
-
-    private ArithmeticBinaryExpression(Optional<NodeLocation> location, Operator operator, Expression left, Expression right)
-    {
-        super(location);
         this.operator = operator;
         this.left = left;
         this.right = right;
@@ -70,26 +58,20 @@ public class ArithmeticBinaryExpression
         return operator;
     }
 
-    public Expression getLeft()
+    public SparkExpression getLeft()
     {
         return left;
     }
 
-    public Expression getRight()
+    public SparkExpression getRight()
     {
         return right;
     }
 
     @Override
-    public <R, C> R accept(AstVisitor<R, C> visitor, C context)
+    <R, C> R accept(SparkExpressionTreeVisitor<R, C> visitor, C context)
     {
         return visitor.visitArithmeticBinary(this, context);
-    }
-
-    @Override
-    public List<Node> getChildren()
-    {
-        return ImmutableList.of(left, right);
     }
 
     @Override
@@ -101,9 +83,8 @@ public class ArithmeticBinaryExpression
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-
         ArithmeticBinaryExpression that = (ArithmeticBinaryExpression) o;
-        return (operator == that.operator) &&
+        return operator == that.operator &&
                 Objects.equals(left, that.left) &&
                 Objects.equals(right, that.right);
     }
@@ -115,12 +96,12 @@ public class ArithmeticBinaryExpression
     }
 
     @Override
-    public boolean shallowEquals(Node other)
+    public String toString()
     {
-        if (!sameClass(this, other)) {
-            return false;
-        }
-
-        return operator == ((ArithmeticBinaryExpression) other).operator;
+        return toStringHelper(this)
+                .add("operator", operator)
+                .add("left", left)
+                .add("right", right)
+                .toString();
     }
 }
