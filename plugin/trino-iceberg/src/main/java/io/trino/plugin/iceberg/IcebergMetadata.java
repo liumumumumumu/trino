@@ -1834,6 +1834,14 @@ public class IcebergMetadata
             schemaUpdate.updateColumn(name, newType.asPrimitiveType());
             return;
         }
+        //List type comparison needs to determine whether the element type is consistent
+        if (sourceType.isListType() && newType.isListType()) {
+            Types.ListType sourceListType = sourceType.asListType();
+            Types.ListType newListType = newType.asListType();
+            if (sourceListType.elementType().equals(newListType.elementType())) {
+                return;
+            }
+        }
         if (sourceType instanceof StructType sourceRowType && newType instanceof StructType newRowType) {
             // Add, update or delete fields
             List<NestedField> fields = Streams.concat(sourceRowType.fields().stream(), newRowType.fields().stream())
