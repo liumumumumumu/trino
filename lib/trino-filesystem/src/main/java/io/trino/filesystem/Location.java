@@ -61,7 +61,7 @@ public final class Location
         checkArgument(!location.isEmpty(), "location is empty");
         checkArgument(!location.isBlank(), "location is blank");
 
-        checkArgument(location.indexOf('#') < 0, "Fragment is not allowed in a file system location: %s", location);
+//        checkArgument(location.indexOf('#') < 0, "Fragment is not allowed in a file system location: %s", location);
         checkArgument(location.indexOf('?') < 0, "URI query component is not allowed in a file system location: %s", location);
 
         // legacy HDFS location that is just a path
