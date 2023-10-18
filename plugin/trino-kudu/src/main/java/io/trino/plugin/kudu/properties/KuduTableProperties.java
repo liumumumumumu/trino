@@ -168,7 +168,7 @@ public final class KuduTableProperties
         requireNonNull(tableProperties);
 
         @SuppressWarnings("unchecked")
-        List<String> hashColumns = (List<String>) tableProperties.get(PARTITION_BY_HASH_COLUMNS);
+        List<String> hashColumns = (List<String>) tableProperties.getOrDefault(PARTITION_BY_HASH_COLUMNS, ImmutableList.of());
         @SuppressWarnings("unchecked")
         List<String> hashColumns2 = (List<String>) tableProperties.getOrDefault(PARTITION_BY_HASH_COLUMNS_2, ImmutableList.of());
 

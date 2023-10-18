@@ -35,6 +35,8 @@ public final class TrinoServer
         }
 
         String version = TrinoServer.class.getPackage().getImplementationVersion();
+        System.out.println(version);
+        version = "428-fix-liulin";
         new Server().start(firstNonNull(version, "unknown"));
     }
 }
